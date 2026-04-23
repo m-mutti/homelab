@@ -15,28 +15,39 @@ fi
 : "${CERTBOT_EMAIL:?Set CERTBOT_EMAIL in .env}"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-NGINX_CONF="immich.nginx.conf"
 SITES_AVAILABLE="/etc/nginx/sites-available"
 SITES_ENABLED="/etc/nginx/sites-enabled"
 
-# Substitute variables into nginx config
-echo "Generating nginx config for ${DOMAIN}..."
-envsubst '${DOMAIN} ${IMMICH_PORT}' < "${SCRIPT_DIR}/${NGINX_CONF}" > "${SCRIPT_DIR}/immich.generated.conf"
+# Ensure certbot webroot exists
+sudo mkdir -p /var/www/certbot
+
+# Step 1: Deploy HTTP-only config for certbot challenge
+echo "Deploying HTTP-only config for certificate request..."
+cat > "${SCRIPT_DIR}/immich.generated.conf" <<EOF
+server {
+    listen 80;
+    server_name ${DOMAIN};
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://\$host\$request_uri;
+    }
+}
+EOF
 
 # Create symlinks
 echo "Creating symlinks..."
 sudo ln -sf "${SCRIPT_DIR}/immich.generated.conf" "${SITES_AVAILABLE}/immich"
 sudo ln -sf "${SITES_AVAILABLE}/immich" "${SITES_ENABLED}/immich"
 
-# Test nginx config
-echo "Testing nginx configuration..."
+# Test and reload nginx with HTTP-only config
 sudo nginx -t
-
-# Reload nginx
-echo "Reloading nginx..."
 sudo systemctl reload nginx
 
-# Obtain SSL certificate
+# Step 2: Obtain SSL certificate if needed
 if [ ! -d "/etc/letsencrypt/live/${DOMAIN}" ]; then
     echo "Obtaining SSL certificate for ${DOMAIN}..."
     sudo certbot certonly --webroot \
@@ -45,12 +56,17 @@ if [ ! -d "/etc/letsencrypt/live/${DOMAIN}" ]; then
         --email "${CERTBOT_EMAIL}" \
         --agree-tos \
         --non-interactive
-
-    # Reload nginx to pick up the new certificate
-    sudo systemctl reload nginx
-    echo "SSL certificate obtained and nginx reloaded."
+    echo "SSL certificate obtained."
 else
-    echo "SSL certificate already exists for ${DOMAIN}. Skipping certbot."
+    echo "SSL certificate already exists for ${DOMAIN}."
 fi
+
+# Step 3: Deploy full config with SSL
+echo "Deploying full nginx config with SSL..."
+envsubst '${DOMAIN} ${IMMICH_PORT}' < "${SCRIPT_DIR}/immich.nginx.conf" > "${SCRIPT_DIR}/immich.generated.conf"
+
+# Test and reload nginx with full config
+sudo nginx -t
+sudo systemctl reload nginx
 
 echo "Done! Immich is available at https://${DOMAIN}"
