@@ -20,8 +20,6 @@ services:
       REDIS_HOST: redis
       OVERWRITEPROTOCOL: https
       OVERWRITECLIURL: https://${DOMAIN}
-      APACHE_RUN_USER: '#0'
-      APACHE_RUN_GROUP: '#0'
     restart: always
 
   db:
@@ -52,3 +50,4 @@ services:
 
 volumes:
   redis-data:
+  nextcloud-data:
