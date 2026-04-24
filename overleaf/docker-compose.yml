@@ -1,0 +1,45 @@
+services:
+  overleaf:
+    container_name: overleaf
+    image: sharelatex/sharelatex:latest
+    depends_on:
+      - mongo
+      - redis
+    ports:
+      - ${OVERLEAF_PORT:-8080}:80
+    volumes:
+      - ${OVERLEAF_DATA_LOCATION}:/var/lib/overleaf
+    env_file:
+      - .env
+    environment:
+      OVERLEAF_MONGO_URL: mongodb://mongo/overleaf
+      OVERLEAF_REDIS_HOST: redis
+      OVERLEAF_APP_NAME: ${OVERLEAF_APP_NAME:-Overleaf}
+      OVERLEAF_SITE_URL: https://${DOMAIN}
+      OVERLEAF_NAV_TITLE: ${OVERLEAF_APP_NAME:-Overleaf}
+      OVERLEAF_ADMIN_EMAIL: ${ADMIN_EMAIL}
+    restart: always
+
+  mongo:
+    container_name: overleaf_mongo
+    image: mongo:5.0
+    volumes:
+      - ${MONGO_DATA_LOCATION}:/data/db
+    restart: always
+    healthcheck:
+      test: echo 'db.stats().ok' | mongo localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    container_name: overleaf_redis
+    image: redis:6.2-alpine
+    volumes:
+      - redis-data:/data
+    restart: always
+    healthcheck:
+      test: redis-cli ping || exit 1
+
+volumes:
+  redis-data:

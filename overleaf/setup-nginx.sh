@@ -1,0 +1,72 @@
+#!/bin/bash
+set -e
+
+# Load variables from .env
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
+else
+    echo "Error: .env file not found. Run this script from the overleaf directory."
+    exit 1
+fi
+
+# Required variables
+: "${DOMAIN:?Set DOMAIN in .env}"
+: "${OVERLEAF_PORT:=8080}"
+: "${CERTBOT_EMAIL:?Set CERTBOT_EMAIL in .env}"
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SITES_AVAILABLE="/etc/nginx/sites-available"
+SITES_ENABLED="/etc/nginx/sites-enabled"
+
+# Ensure certbot webroot exists
+sudo mkdir -p /var/www/certbot
+
+# Step 1: Deploy HTTP-only config for certbot challenge
+echo "Deploying HTTP-only config for certificate request..."
+cat > "${SCRIPT_DIR}/overleaf.generated.conf" <<EOF
+server {
+    listen 80;
+    server_name ${DOMAIN};
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://\$host\$request_uri;
+    }
+}
+EOF
+
+# Create symlinks
+echo "Creating symlinks..."
+sudo ln -sf "${SCRIPT_DIR}/overleaf.generated.conf" "${SITES_AVAILABLE}/overleaf"
+sudo ln -sf "${SITES_AVAILABLE}/overleaf" "${SITES_ENABLED}/overleaf"
+
+# Test and reload nginx with HTTP-only config
+sudo nginx -t
+sudo systemctl reload nginx
+
+# Step 2: Obtain SSL certificate if needed
+if [ ! -d "/etc/letsencrypt/live/${DOMAIN}" ]; then
+    echo "Obtaining SSL certificate for ${DOMAIN}..."
+    sudo certbot certonly --webroot \
+        -w /var/www/certbot \
+        -d "${DOMAIN}" \
+        --email "${CERTBOT_EMAIL}" \
+        --agree-tos \
+        --non-interactive
+    echo "SSL certificate obtained."
+else
+    echo "SSL certificate already exists for ${DOMAIN}."
+fi
+
+# Step 3: Deploy full config with SSL
+echo "Deploying full nginx config with SSL..."
+envsubst '${DOMAIN} ${OVERLEAF_PORT}' < "${SCRIPT_DIR}/overleaf.nginx.conf" > "${SCRIPT_DIR}/overleaf.generated.conf"
+
+# Test and reload nginx with full config
+sudo nginx -t
+sudo systemctl reload nginx
+
+echo "Done! Overleaf is available at https://${DOMAIN}"
