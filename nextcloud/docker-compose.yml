@@ -1,0 +1,52 @@
+services:
+  nextcloud:
+    container_name: nextcloud
+    image: nextcloud:latest
+    depends_on:
+      - db
+      - redis
+    ports:
+      - ${NEXTCLOUD_PORT:-8081}:80
+    volumes:
+      - ${NEXTCLOUD_DATA_LOCATION}:/var/www/html
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: ${DB_DATABASE_NAME}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      NEXTCLOUD_ADMIN_USER: ${ADMIN_USER}
+      NEXTCLOUD_ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      NEXTCLOUD_TRUSTED_DOMAINS: ${DOMAIN}
+      REDIS_HOST: redis
+      OVERWRITEPROTOCOL: https
+      OVERWRITECLIURL: https://${DOMAIN}
+    restart: always
+
+  db:
+    container_name: nextcloud_db
+    image: mariadb:11
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE_NAME}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ${DB_DATA_LOCATION}:/var/lib/mysql
+    restart: always
+    healthcheck:
+      test: mariadb-admin ping -h localhost -u root -p${DB_ROOT_PASSWORD} || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    container_name: nextcloud_redis
+    image: redis:6.2-alpine
+    volumes:
+      - redis-data:/data
+    restart: always
+    healthcheck:
+      test: redis-cli ping || exit 1
+
+volumes:
+  redis-data:
