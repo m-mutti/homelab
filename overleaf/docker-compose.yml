@@ -22,12 +22,12 @@ services:
 
   mongo:
     container_name: overleaf_mongo
-    image: mongo:5.0
+    image: mongo:8.0
     volumes:
       - ${MONGO_DATA_LOCATION}:/data/db
     restart: always
     healthcheck:
-      test: echo 'db.stats().ok' | mongo localhost:27017/test --quiet
+      test: echo 'db.stats().ok' | mongosh --quiet
       interval: 30s
       timeout: 10s
       retries: 5
