@@ -21,13 +21,25 @@ Self-hosted LaTeX editor — a collaborative online LaTeX platform.
    docker compose up -d
    ```
 
-4. Set up nginx and SSL:
+4. Initialize the MongoDB replica set (required for transactions):
+
+   ```bash
+   docker exec overleaf_mongo mongosh --eval "rs.initiate({ _id: 'rs0', members: [{ _id: 0, host: 'mongo:27017' }] })"
+   ```
+
+   Then restart Overleaf to pick it up:
+
+   ```bash
+   docker compose restart overleaf
+   ```
+
+5. Set up nginx and SSL:
 
    ```bash
    ./setup-nginx.sh
    ```
 
-5. Create the admin account by visiting `https://<your-domain>/launchpad`.
+6. Create the admin account by visiting `https://<your-domain>/launchpad`.
 
 ## Services
 
