@@ -1,0 +1,16 @@
+services:
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "${PIHOLE_WEB_PORT:-8082}:80/tcp"
+    environment:
+      TZ: ${TZ}
+      WEBPASSWORD: ${PIHOLE_PASSWORD}
+      FTLCONF_dns_upstreamDNS: ${UPSTREAM_DNS}
+    volumes:
+      - ${PIHOLE_DATA_LOCATION}:/etc/pihole
+      - ${DNSMASQ_DATA_LOCATION}:/etc/dnsmasq.d
+    restart: always
