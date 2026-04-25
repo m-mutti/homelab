@@ -9,6 +9,7 @@ services:
       - homarr-data:/appdata
     environment:
       TZ: ${TZ}
+      SECRET_ENCRYPTION_KEY: ${SECRET_ENCRYPTION_KEY}
     restart: always
 
 volumes:
