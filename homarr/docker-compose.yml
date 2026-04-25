@@ -1,0 +1,15 @@
+services:
+  homarr:
+    container_name: homarr
+    image: ghcr.io/homarr-labs/homarr:latest
+    ports:
+      - "${HOMARR_PORT:-7575}:7575"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - homarr-data:/appdata
+    environment:
+      TZ: ${TZ}
+    restart: always
+
+volumes:
+  homarr-data:
