@@ -51,3 +51,11 @@ If the browser logs repeated WebSocket failures for `/socket.io/`, redeploy the 
 ```bash
 ./setup-nginx.sh
 ```
+
+Then verify nginx is serving the generated Planka config:
+
+```bash
+sudo nginx -T | grep -A 30 -B 5 'server_name planka.mutti.cloud'
+sudo journalctl -u nginx -n 100 --no-pager
+docker compose logs --tail=100 planka
+```
