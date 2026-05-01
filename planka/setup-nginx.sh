@@ -1,0 +1,72 @@
+#!/bin/bash
+set -e
+
+# Load variables from .env
+if [ -f .env ]; then
+    export $(grep -v '^#' .env | xargs)
+else
+    echo "Error: .env file not found. Run this script from the planka directory."
+    exit 1
+fi
+
+# Required variables
+: "${DOMAIN:?Set DOMAIN in .env}"
+: "${PLANKA_PORT:=3000}"
+: "${CERTBOT_EMAIL:?Set CERTBOT_EMAIL in .env}"
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SITES_AVAILABLE="/etc/nginx/sites-available"
+SITES_ENABLED="/etc/nginx/sites-enabled"
+
+# Ensure certbot webroot exists
+sudo mkdir -p /var/www/certbot
+
+# Step 1: Deploy HTTP-only config for certbot challenge
+echo "Deploying HTTP-only config for certificate request..."
+cat > "${SCRIPT_DIR}/planka.generated.conf" <<EOF
+server {
+    listen 80;
+    server_name ${DOMAIN};
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    location / {
+        return 301 https://\$host\$request_uri;
+    }
+}
+EOF
+
+# Create symlinks
+echo "Creating symlinks..."
+sudo ln -sf "${SCRIPT_DIR}/planka.generated.conf" "${SITES_AVAILABLE}/planka"
+sudo ln -sf "${SITES_AVAILABLE}/planka" "${SITES_ENABLED}/planka"
+
+# Test and reload nginx with HTTP-only config
+sudo nginx -t
+sudo systemctl reload nginx
+
+# Step 2: Obtain SSL certificate if needed
+if [ ! -d "/etc/letsencrypt/live/${DOMAIN}" ]; then
+    echo "Obtaining SSL certificate for ${DOMAIN}..."
+    sudo certbot certonly --webroot \
+        -w /var/www/certbot \
+        -d "${DOMAIN}" \
+        --email "${CERTBOT_EMAIL}" \
+        --agree-tos \
+        --non-interactive
+    echo "SSL certificate obtained."
+else
+    echo "SSL certificate already exists for ${DOMAIN}."
+fi
+
+# Step 3: Deploy full config with SSL
+echo "Deploying full nginx config with SSL..."
+envsubst '${DOMAIN} ${PLANKA_PORT}' < "${SCRIPT_DIR}/planka.nginx.conf" > "${SCRIPT_DIR}/planka.generated.conf"
+
+# Test and reload nginx with full config
+sudo nginx -t
+sudo systemctl reload nginx
+
+echo "Done! Planka is available at https://${DOMAIN}"
