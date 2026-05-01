@@ -43,3 +43,11 @@ After setting `BASE_URL=https://<domain>`, `DOMAIN`, and `CERTBOT_EMAIL` in `.en
 docker compose pull
 docker compose up -d
 ```
+
+## Troubleshooting
+
+If the browser logs repeated WebSocket failures for `/socket.io/`, redeploy the nginx config after confirming `.env` has `BASE_URL=https://<domain>`:
+
+```bash
+./setup-nginx.sh
+```
