@@ -30,7 +30,7 @@ services:
     container_name: download_manager_ariang
     image: p3terx/ariang:latest
     ports:
-      - "${ARIANG_PORT:-6880}:6880"
+      - "127.0.0.1:${ARIANG_PORT:-6880}:6880"
     logging:
       driver: json-file
       options:
