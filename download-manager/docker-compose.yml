@@ -3,7 +3,7 @@ services:
     container_name: download_manager_aria2
     image: p3terx/aria2-pro:latest
     ports:
-      - "127.0.0.1:${ARIA2_RPC_PORT:-6800}:6800"
+      - "${LAN_BIND_IP:-0.0.0.0}:${ARIA2_RPC_PORT:-6800}:6800"
       - "${ARIA2_LISTEN_PORT:-6888}:${ARIA2_LISTEN_PORT:-6888}"
       - "${ARIA2_LISTEN_PORT:-6888}:${ARIA2_LISTEN_PORT:-6888}/udp"
     volumes:
@@ -30,7 +30,7 @@ services:
     container_name: download_manager_ariang
     image: p3terx/ariang:latest
     ports:
-      - "127.0.0.1:${ARIANG_PORT:-6880}:6880"
+      - "${LAN_BIND_IP:-0.0.0.0}:${ARIANG_PORT:-6880}:6880"
     logging:
       driver: json-file
       options:

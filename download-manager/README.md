@@ -28,19 +28,19 @@ Aria2 Pro plus AriaNg for managing HTTP, FTP, SFTP, BitTorrent, and Metalink dow
    docker compose up -d
    ```
 
-5. Access AriaNg from the server at `http://127.0.0.1:6880`.
+5. Access AriaNg from your network at `http://<server-lan-ip>:6880`.
 
 ## AriaNg Connection
 
 In AriaNg, open `AriaNg Settings` > `RPC` and set:
 
 - Protocol: `http`
-- Host: `127.0.0.1`
+- Host: your server's LAN IP
 - Port: `6800`
 - Interface: `/jsonrpc`
 - Secret token: your `RPC_SECRET`
 
-The web UI and Aria2 RPC endpoint are both bound to `127.0.0.1`, so they are not reachable from other machines unless you use SSH tunneling or a VPN.
+Set `LAN_BIND_IP` in `.env` to your server's LAN IP for LAN-only access. Do not port-forward `ARIANG_PORT` or `ARIA2_RPC_PORT` from your router to the internet.
 
 ## Updating
 
