@@ -1,0 +1,38 @@
+services:
+  aria2:
+    container_name: download_manager_aria2
+    image: p3terx/aria2-pro:latest
+    ports:
+      - "127.0.0.1:${ARIA2_RPC_PORT:-6800}:6800"
+      - "${ARIA2_LISTEN_PORT:-6888}:${ARIA2_LISTEN_PORT:-6888}"
+      - "${ARIA2_LISTEN_PORT:-6888}:${ARIA2_LISTEN_PORT:-6888}/udp"
+    volumes:
+      - ${ARIA2_CONFIG_LOCATION}:/config
+      - ${DOWNLOADS_LOCATION}:/downloads
+    environment:
+      PUID: ${PUID}
+      PGID: ${PGID}
+      UMASK_SET: ${UMASK_SET}
+      RPC_SECRET: ${RPC_SECRET}
+      RPC_PORT: 6800
+      LISTEN_PORT: ${ARIA2_LISTEN_PORT}
+      DISK_CACHE: ${DISK_CACHE}
+      IPV6_MODE: ${IPV6_MODE}
+      UPDATE_TRACKERS: ${UPDATE_TRACKERS}
+      TZ: ${TZ}
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+    restart: unless-stopped
+
+  ariang:
+    container_name: download_manager_ariang
+    image: p3terx/ariang:latest
+    ports:
+      - "${ARIANG_PORT:-6880}:6880"
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+    restart: unless-stopped
