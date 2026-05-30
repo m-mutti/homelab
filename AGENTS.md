@@ -11,6 +11,7 @@ This project will be used to deploy services on my personal server. I will make 
 | Nextcloud  | `nextcloud/` | 8081  |
 | Homarr     | `homarr/`    | 7575  |
 | Pi-hole    | `pihole/`    | 8082  |
+| Portainer  | `portainer/` | 9000  |
 
 ## Server Details
 
