@@ -1,0 +1,14 @@
+services:
+  jellyfin:
+    container_name: jellyfin
+    image: jellyfin/jellyfin:latest
+    network_mode: bridge
+    ports:
+      - "${JELLYFIN_PORT:-8096}:8096"
+    volumes:
+      - ${JELLYFIN_CONFIG:-./data/config}:/config
+      - ${JELLYFIN_CACHE:-./data/cache}:/cache
+      - ${JELLYFIN_MEDIA:-./data/media}:/media
+    environment:
+      TZ: ${TZ}
+    restart: unless-stopped
