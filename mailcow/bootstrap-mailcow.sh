@@ -18,7 +18,7 @@ fi
 : "${MAILCOW_HTTPS_PORT:=8443}"
 : "${SKIP_LETS_ENCRYPT:=y}"
 : "${IPV6_BOOL:=n}"
-: "${MAILCOW_IPV4_NETWORK:=172.31.1.0/24}"
+: "${MAILCOW_IPV4_NETWORK:=172.31.1}"
 : "${SKIP_CLAMD:=y}"
 
 if [ ! -d "${MAILCOW_DIR}/.git" ]; then

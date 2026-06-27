@@ -46,8 +46,10 @@ Mail hosting is different from the other services in this repo:
    If Docker reports `Pool overlaps with other one on this address space`, choose a different private subnet in `.env`, then rerun `./bootstrap-mailcow.sh`:
 
    ```bash
-   MAILCOW_IPV4_NETWORK=172.31.1.0/24
+   MAILCOW_IPV4_NETWORK=172.31.1
    ```
+
+   Mailcow appends `.0/24` internally, so do not include CIDR notation here.
 
 5. Configure host nginx and copy the HTTPS certificate into mailcow:
 
