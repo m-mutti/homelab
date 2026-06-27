@@ -27,8 +27,8 @@ PostGIS database, and Redis.
 
 3. Access Dawarich at `http://<server-ip>:3000`.
 
-   Default login: `demo@dawarich.app` / `password`. Change the password (and the
-   email) immediately after first login.
+   Default login: `demo@dawarich.app` / `safepassword`. Change the password (and
+   the email) immediately after first login.
 
 ## Nginx + SSL (optional)
 

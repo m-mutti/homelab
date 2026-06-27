@@ -14,6 +14,7 @@ This project will be used to deploy services on my personal server. I will make 
 | Portainer  | `portainer/` | 9000  |
 | Jellyfin   | `jellyfin/`  | 8096  |
 | Dawarich   | `dawarich/`  | 3000  |
+| mailcow    | `mailcow/`   | 80/443, mail ports |
 
 ## Server Details
 
