@@ -51,6 +51,14 @@ Mail hosting is different from the other services in this repo:
 
    Mailcow appends `.0/24` internally, so do not include CIDR notation here.
 
+   If you change `MAILCOW_IPV4_NETWORK`, also update `MAILCOW_TRUSTED_PROXIES` to the matching gateway IP, usually:
+
+   ```bash
+   MAILCOW_TRUSTED_PROXIES=172.31.1.1
+   ```
+
+   A wrong trusted proxy value can cause `ERR_TOO_MANY_REDIRECTS` behind host nginx.
+
 5. Configure host nginx and copy the HTTPS certificate into mailcow:
 
    ```bash
