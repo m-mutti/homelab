@@ -1,0 +1,4 @@
+# This file delegates to the official mailcow-dockerized compose file.
+# Run ./bootstrap-mailcow.sh first to create ./mailcow-dockerized.
+include:
+  - path: ./mailcow-dockerized/docker-compose.yml

@@ -39,12 +39,11 @@ Mail hosting is different from the other services in this repo:
 4. Start mailcow:
 
    ```bash
-   cd mailcow-dockerized
    docker compose pull
    docker compose up -d
    ```
 
-5. From the `mailcow/` folder, configure host nginx and copy the HTTPS certificate into mailcow:
+5. Configure host nginx and copy the HTTPS certificate into mailcow:
 
    ```bash
    ./setup-nginx.sh
@@ -116,9 +115,11 @@ You can add it as a certbot deploy hook later.
 ## Updating
 
 ```bash
-cd mailcow-dockerized
-./update.sh
+docker compose pull
+docker compose up -d
 ```
+
+For mailcow's full upstream update flow, run `./update.sh` inside `mailcow-dockerized/`.
 
 ## References
 
