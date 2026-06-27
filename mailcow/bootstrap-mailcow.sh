@@ -18,6 +18,7 @@ fi
 : "${MAILCOW_HTTPS_PORT:=8443}"
 : "${SKIP_LETS_ENCRYPT:=y}"
 : "${IPV6_BOOL:=n}"
+: "${MAILCOW_IPV4_NETWORK:=172.31.1.0/24}"
 : "${SKIP_CLAMD:=y}"
 
 if [ ! -d "${MAILCOW_DIR}/.git" ]; then
@@ -58,6 +59,7 @@ set_config HTTP_PORT "${MAILCOW_HTTP_PORT}"
 set_config HTTPS_BIND "${MAILCOW_HTTPS_BIND}"
 set_config HTTPS_PORT "${MAILCOW_HTTPS_PORT}"
 set_config SKIP_LETS_ENCRYPT "${SKIP_LETS_ENCRYPT}"
+set_config IPV4_NETWORK "${MAILCOW_IPV4_NETWORK}"
 if [ "${IPV6_BOOL}" = "n" ]; then
     set_config IPV6_NETWORK ""
 fi
