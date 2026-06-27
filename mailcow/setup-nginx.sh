@@ -13,6 +13,8 @@ fi
 : "${MAILCOW_DIR:=./mailcow-dockerized}"
 : "${MAILCOW_HTTP_BIND:=127.0.0.1}"
 : "${MAILCOW_HTTP_PORT:=8088}"
+: "${MAILCOW_HTTPS_BIND:=127.0.0.1}"
+: "${MAILCOW_HTTPS_PORT:=8443}"
 : "${CERTBOT_EMAIL:?Set CERTBOT_EMAIL in .env}"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -58,7 +60,7 @@ else
 fi
 
 echo "Deploying full nginx config with SSL..."
-envsubst '${MAILCOW_HOSTNAME} ${MAIL_DOMAIN} ${MAILCOW_HTTP_BIND} ${MAILCOW_HTTP_PORT}' < "${SCRIPT_DIR}/mailcow.nginx.conf" > "${SCRIPT_DIR}/mailcow.generated.conf"
+envsubst '${MAILCOW_HOSTNAME} ${MAIL_DOMAIN} ${MAILCOW_HTTP_BIND} ${MAILCOW_HTTP_PORT} ${MAILCOW_HTTPS_BIND} ${MAILCOW_HTTPS_PORT}' < "${SCRIPT_DIR}/mailcow.nginx.conf" > "${SCRIPT_DIR}/mailcow.generated.conf"
 
 sudo nginx -t
 sudo systemctl reload nginx

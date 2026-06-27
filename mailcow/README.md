@@ -59,6 +59,8 @@ Mail hosting is different from the other services in this repo:
 
    A wrong trusted proxy value can cause `ERR_TOO_MANY_REDIRECTS` behind host nginx.
 
+   The host nginx template proxies to mailcow's local HTTPS port (`MAILCOW_HTTPS_PORT`) to avoid loops through mailcow's internal HTTP-to-HTTPS redirect.
+
 5. Configure host nginx and copy the HTTPS certificate into mailcow:
 
    ```bash
