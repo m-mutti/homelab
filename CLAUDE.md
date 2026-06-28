@@ -15,6 +15,7 @@ This project will be used to deploy services on my personal server. I will make 
 | Jellyfin   | `jellyfin/`  | 8096  |
 | Dawarich   | `dawarich/`  | 3000  |
 | mailcow    | `mailcow/`   | 80/443, mail ports |
+| n8n        | `n8n/`       | 5678  |
 
 ## Server Details
 
